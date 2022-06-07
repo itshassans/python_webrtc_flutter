@@ -26,13 +26,11 @@ class FrameProducer(ThreadedSubscriptionProducer):
         # self._setReady(False)
 
         self._setReady(True)
-        self.cap = cv2.VideoCapture('record0001.mp4')
+        self.cap = cv2.VideoCapture(0)
         while self.cap.isOpened():
-            # Capture frame-by-frame
             ret, frame = self.cap.read()
-            if ret:
-                self._put_nowait(frame)
-            sleep(0.04)
+            self._put_nowait(frame)
+            # sleep(0.04)
         self._setReady(False)
 
     def subscribe(self, subscription=None):

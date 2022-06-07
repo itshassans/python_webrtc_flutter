@@ -5,10 +5,8 @@ import logging
 import os
 import ssl
 import uuid
-
 import cv2
 from aiohttp import web
-from av import VideoFrame
 import aiohttp_cors
 from aiortc import MediaStreamTrack, RTCPeerConnection, RTCSessionDescription
 from aiortc.contrib.media import MediaBlackhole, MediaPlayer, MediaRecorder, MediaRelay
@@ -61,7 +59,11 @@ async def offer(request):
     log_info("Created for %s", request.remote)
 
     # prepare local media
-    player = MediaPlayer(os.path.join(ROOT, "record0001.mp4"))
+    player = MediaPlayer(os.path.join(ROOT, "twohourvideo.mp4"))
+    pc.addTrack(player.video)
+    # player = MediaPlayer('video=HP Wide Vision HD Camera', format='dshow', options={
+    #     'video_size': '640x480'
+    # })
     recorder = MediaBlackhole()
 
     @pc.on("datachannel")
@@ -74,6 +76,7 @@ async def offer(request):
     @pc.on("connectionstatechange")
     async def on_connectionstatechange():
         log_info("Connection state is %s", pc.connectionState)
+        log_info("ICE Connection state is %s", pc.iceConnectionState)
         if pc.connectionState == "failed":
             await pc.close()
             pcs.discard(pc)
@@ -89,7 +92,7 @@ async def offer(request):
             pc.addTrack(player.video)
             # pc.addTrack(
             #     VideoTransformTrack(
-            #         relay.subscribe(track), transform=params["video_transform"]
+            #        relay.subscribe(track), transform=params["video_transform"]
             #     )
             # )
 
